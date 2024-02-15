@@ -213,8 +213,8 @@
                 </StackPane>
                 <TableView fx:id="tableView" editable="true" VBox.vgrow="ALWAYS">
                     <columns>
-                        <TableColumn fx:id="tcDescrizione" editable="true" prefWidth="75.0" text="Descrizione" />
-                        <TableColumn fx:id="tcScadenza" editable="true" prefWidth="75.0" text="Scadenza" />
+                        <TableColumn fx:id="tcDescrizione" editable="true" onEditCommit="#editDescrizione" prefWidth="75.0" sortable="false" text="Descrizione" />
+                        <TableColumn fx:id="tcScadenza" editable="true" onEditCommit="#editScadenza" prefWidth="75.0" sortable="false" text="Scadenza" />
                     </columns>
                     <columnResizePolicy>
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

@@ -18,6 +18,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ResourceBundle;
@@ -43,6 +44,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
@@ -52,6 +54,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.Region;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 /**
  * Controller MVC dell'applicazione.
@@ -153,7 +156,7 @@ public class DeadlineMasterController implements Initializable {
     private TableColumn<Deadline, String> tcDescrizione;
 
     @FXML
-    private TableColumn<Deadline, String> tcScadenza;
+    private TableColumn<Deadline, LocalDate> tcScadenza;
 
     private ObservableList<Deadline> deadlines;
 
@@ -206,6 +209,8 @@ public class DeadlineMasterController implements Initializable {
         guidaContentText.append("[ Copiare una scadenza ]\n");
         guidaContentText.append("Gli strumenti [Taglia], [Copia] e [Incolla] consentono di tagliare, copiare e incollare scadenze, aggiungendole alla lista in automatico. ");
         guidaContentText.append("Incollando una scadenza in un altro programma, verrà incollata una stringa nel formato <descrizione>|<data>. \n\n");
+        guidaContentText.append("[ Modificare una scadenza ]\n");
+        guidaContentText.append("Per modificare una scadenza, fare doppio click sulla descrizione o sulla data, aggiornare il dato e premere [Invio] per confermare. \n\n");
         guidaContentText.append("[ Eliminare una scadenza ]\n");
         guidaContentText.append("Per eliminare una o più scadenze, selezionarle tenendo premuto [Ctrl] e scegliere l'opzione [Elimina] dal menu [Modifica]. \n\n");
         guidaAlert.setContentText(guidaContentText.toString());
@@ -234,7 +239,27 @@ public class DeadlineMasterController implements Initializable {
         load();
 
         tcDescrizione.setCellValueFactory(new PropertyValueFactory<>("descrizione"));
+        tcDescrizione.setCellFactory(TextFieldTableCell.forTableColumn());
         tcScadenza.setCellValueFactory(new PropertyValueFactory<>("scadenza"));
+        tcScadenza.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<LocalDate>() {
+            @Override
+            public String toString(LocalDate object) {
+                try {
+                    return object.toString();
+                } catch (NullPointerException ex) {
+                    return null;
+                }
+            }
+
+            @Override
+            public LocalDate fromString(String string) {
+                try {
+                    return LocalDate.parse(string);
+                } catch (DateTimeParseException ex) {
+                    return null;
+                }
+            }
+        }));
         tableView.setItems(deadlines);
         tableView.getSelectionModel()
                 .setSelectionMode(SelectionMode.MULTIPLE);
@@ -472,6 +497,29 @@ public class DeadlineMasterController implements Initializable {
         imageView.setFitHeight(ALERT_GRAPHICS_HEIGHT);
         infoAlert.setGraphic(imageView);
         infoAlert.showAndWait();
+    }
+
+    @FXML
+    private void editDescrizione(TableColumn.CellEditEvent<Deadline, String> cellEditEvent) {
+        final Deadline selectedItem = tableView.getSelectionModel().getSelectedItem();
+        if (!cellEditEvent.getNewValue().trim().isEmpty()) {
+            selectedItem.setDescrizione(cellEditEvent.getNewValue().trim());
+        }
+        Collections.sort(deadlines);
+        save();
+    }
+
+    @FXML
+    private void editScadenza(TableColumn.CellEditEvent<Deadline, LocalDate> cellEditEvent) {
+        final Deadline selectedItem = tableView.getSelectionModel().getSelectedItem();
+        if (cellEditEvent.getNewValue() != null) {
+            selectedItem.setScadenza(cellEditEvent.getNewValue());
+        } else {
+            errorAlert.setContentText("La data specificata non è corretta!");
+            errorAlert.showAndWait();
+        }
+        Collections.sort(deadlines);
+        save();
     }
 
 }
