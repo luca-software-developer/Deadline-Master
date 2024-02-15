@@ -9,4 +9,4 @@
 Deadline Master è un'applicazione per la gestione delle scadenze.
 
 ## Screenshot
-![screenshot-dm](https://github.com/luca-software-developer/Deadline-Master/assets/67876436/afb59e7c-e2a2-456a-9daf-6d83ae61e66e)
+![screenshot-dm](https://github.com/luca-software-developer/Deadline-Master/assets/67876436/c00dd5f5-1f5a-4745-be3c-9482d7703d32)
